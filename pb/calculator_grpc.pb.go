@@ -21,6 +21,7 @@ type CalculatorClient interface {
 	Add(ctx context.Context, in *CalculationRequest, opts ...grpc.CallOption) (*CalculationResponse, error)
 	Divide(ctx context.Context, in *CalculationRequest, opts ...grpc.CallOption) (*CalculationResponse, error)
 	Sum(ctx context.Context, in *NumbersRequest, opts ...grpc.CallOption) (*CalculationResponse, error)
+	Multiply(ctx context.Context, in *CalculationRequest, opts ...grpc.CallOption) (*CalculationResponse, error)
 }
 
 type calculatorClient struct {
@@ -58,6 +59,15 @@ func (c *calculatorClient) Sum(ctx context.Context, in *NumbersRequest, opts ...
 	return out, nil
 }
 
+func (c *calculatorClient) Multiply(ctx context.Context, in *CalculationRequest, opts ...grpc.CallOption) (*CalculationResponse, error) {
+	out := new(CalculationResponse)
+	err := c.cc.Invoke(ctx, "/calculator.Calculator/Multiply", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CalculatorServer is the server API for Calculator service.
 // All implementations must embed UnimplementedCalculatorServer
 // for forward compatibility
@@ -65,6 +75,7 @@ type CalculatorServer interface {
 	Add(context.Context, *CalculationRequest) (*CalculationResponse, error)
 	Divide(context.Context, *CalculationRequest) (*CalculationResponse, error)
 	Sum(context.Context, *NumbersRequest) (*CalculationResponse, error)
+	Multiply(context.Context, *CalculationRequest) (*CalculationResponse, error)
 	mustEmbedUnimplementedCalculatorServer()
 }
 
@@ -80,6 +91,9 @@ func (UnimplementedCalculatorServer) Divide(context.Context, *CalculationRequest
 }
 func (UnimplementedCalculatorServer) Sum(context.Context, *NumbersRequest) (*CalculationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Sum not implemented")
+}
+func (UnimplementedCalculatorServer) Multiply(context.Context, *CalculationRequest) (*CalculationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Multiply not implemented")
 }
 func (UnimplementedCalculatorServer) mustEmbedUnimplementedCalculatorServer() {}
 
@@ -148,6 +162,24 @@ func _Calculator_Sum_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Calculator_Multiply_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CalculationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CalculatorServer).Multiply(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/calculator.Calculator/Multiply",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CalculatorServer).Multiply(ctx, req.(*CalculationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Calculator_ServiceDesc is the grpc.ServiceDesc for Calculator service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -166,6 +198,10 @@ var Calculator_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Sum",
 			Handler:    _Calculator_Sum_Handler,
+		},
+		{
+			MethodName: "Multiply",
+			Handler:    _Calculator_Multiply_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -8,6 +8,7 @@ service Calculator {
   rpc Add(CalculationRequest) returns (CalculationResponse);
   rpc Divide(CalculationRequest) returns (CalculationResponse);
   rpc Sum(NumbersRequest) returns (CalculationResponse);
+  rpc Multiply(CalculationRequest) returns (CalculationResponse);
 }
 
 message CalculationRequest {
