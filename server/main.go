@@ -52,6 +52,12 @@ func (s *server) Multiply(ctx context.Context, in *pb.CalculationRequest) (*pb.C
 	}, nil
 }
 
+func (s *server) Subtract(ctx context.Context, in *pb.CalculationRequest) (*pb.CalculationResponse, error) {
+	return &pb.CalculationResponse{
+		Result: in.A - in.B,
+	}, nil
+}
+
 func main() {
 	listener, err := net.Listen("tcp", ":8080")
 	if err != nil {
