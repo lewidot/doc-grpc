@@ -20,6 +20,12 @@ func (s *server) Add(ctx context.Context, in *pb.CalculationRequest) (*pb.Calcul
 	}, nil
 }
 
+func (s *server) Divide(ctx context.Context, in *pb.CalculationRequest) (*pb.CalculationResponse, error) {
+	return &pb.CalculationResponse{
+		Result: in.A / in.B,
+	}, nil
+}
+
 func main() {
 	listener, err := net.Listen("tcp", ":8080")
 	if err != nil {
